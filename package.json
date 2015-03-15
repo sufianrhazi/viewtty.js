@@ -1,5 +1,5 @@
 {
-  "name": "ttyplay",
+  "name": "viewtty",
   "version": "0.0.1",
   "description": "A ttyrec player for the browser",
   "author": {
@@ -10,20 +10,20 @@
   "tags": [
     "tty",
     "ttyrec",
-    "ttyplay",
+    "viewtty",
     "terminal"
   ],
   "keywords": [
     "tty",
     "ttyrec",
-    "ttyplay",
+    "viewtty",
     "terminal"
   ],
   "main": "./index.js",
-  "homepage": "https://github.com/sufianrhazi/ttyplay.js.git",
-  "repository": "git://github.com/sufianrhazi/ttyplay.js.git",
+  "homepage": "https://github.com/sufianrhazi/viewtty.js.git",
+  "repository": "git://github.com/sufianrhazi/viewtty.js.git",
   "bugs": {
-    "url": "https://github.com/sufianrhazi/ttyplay.js/issues"
+    "url": "https://github.com/sufianrhazi/viewtty.js/issues"
   },
   "license": "MIT",
   "dependencies": {
