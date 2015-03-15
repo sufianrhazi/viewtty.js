@@ -1,4 +1,4 @@
-var terminal = new TTYPlayer.Terminal({
+var terminal = new ViewTTY.Terminal({
     cols: 80,
     rows: 25,
     noFocus: true,
@@ -8,7 +8,7 @@ terminal.open(document.getElementById('term'));
 terminal.showCursor();
 
 // Then we create a player and hook its events to the terminal for display
-var player = new TTYPlayer.Player();
+var player = new ViewTTY.Player();
 player.addListener(function (event) {
     if (event.type === 'data') {
         terminal.write(event.data.data);
@@ -63,7 +63,7 @@ player.addListener(function (event) {
 // Now all we need to do is fetch the ttyrec output file as an ArrayBuffer
 fetchArrayBuffer('example.ttyrec', function (arraybuffer) {
     // parse the response into chunks,
-    var parser = new TTYPlayer.Parser();
+    var parser = new ViewTTY.Parser();
     var chunks = parser.parse(arraybuffer);
 
     // load the chunks into the player,
@@ -83,6 +83,6 @@ function fetchArrayBuffer(url, callback) {
                 callback(this.response);
             }
         }
-    }
+    };
     xhr.send();
 }
