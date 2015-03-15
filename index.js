@@ -5,6 +5,7 @@ var terminal = new ViewTTY.Terminal({
     noEvents: true
 });
 terminal.open(document.getElementById('term'));
+terminal.write('Loading ttyrec file');
 terminal.showCursor();
 
 // Then we create a player and hook its events to the terminal for display
@@ -62,15 +63,21 @@ player.addListener(function (event) {
 
 // Now all we need to do is fetch the ttyrec output file as an ArrayBuffer
 fetchArrayBuffer('example.ttyrec', function (arraybuffer) {
-    // parse the response into chunks,
-    var parser = new ViewTTY.Parser();
-    var chunks = parser.parse(arraybuffer);
+    terminal.reset();
+    terminal.showCursor();
+    try {
+        // parse the response into chunks,
+        var parser = new ViewTTY.Parser();
+        var chunks = parser.parse(arraybuffer);
 
-    // load the chunks into the player,
-    player.load(chunks);
+        // load the chunks into the player,
+        player.load(chunks);
 
-    // and now we're ready to go!
-    player.play();
+        // and now we're ready to go!
+        player.play();
+    } catch (e) {
+        terminal.write('\n\rERROR: unable to play the ttyrec file!\n\rYour browser may not be supported :(');
+    }
 });
 
 function fetchArrayBuffer(url, callback) {
@@ -81,7 +88,11 @@ function fetchArrayBuffer(url, callback) {
         if (this.readyState === this.DONE) {
             if (this.status === 200) {
                 callback(this.response);
+            } else {
+                terminal.write('\n\rERROR: failed to load the ttyrec file.');
             }
+        } else {
+            terminal.write('.');
         }
     };
     xhr.send();
