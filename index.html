@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>ttyplay.js</title>
+        <style>
+        .terminal {
+            display: inline-block;
+            font-family: monospace;
+            font-size: 15px;
+            line-height: 15px;
+            padding: 0;
+            margin: 0;
+        }
+        .terminal-cursor {
+            position: relative;
+        }
+        .terminal-cursor::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background-color: rgba(128, 255, 128, 0.5);
+        }
+        </style>
+    </head>
+    <body>
+        <div><pre class="terminal" id="term"></pre></div>
+        <button data-rewind>rewind</button>
+        <button data-pause>pause</button>
+        <button data-play>play</button>
+        <script src="build/ttyplayer.js"></script>
+        <script>
+var term = new TTYPlayer.Terminal({
+    cols: 80,
+    rows: 25,
+    noFocus: true,
+    noEvents: true
+});
+term.open(document.getElementById('term'));
+term.showCursor();
+
+var player;
+var xhr = new XMLHttpRequest();
+xhr.open('GET', 'example.ttyrec');
+xhr.responseType = 'arraybuffer';
+xhr.onreadystatechange = function () {
+    if (this.readyState === this.DONE) {
+        if (this.status === 200) {
+            var parser = new TTYPlayer.Parser();
+            var chunks = parser.parse(this.response);
+            player = new TTYPlayer.Player(chunks, window);
+            player.addListener(function (event) {
+                if (event.type === 'data') {
+                    term.write(event.data.data);
+                }
+            })
+        }
+    }
+};
+xhr.send();
+document.querySelector('[data-rewind]').addEventListener('click', function () {
+    player.rewind();
+});
+document.querySelector('[data-play]').addEventListener('click', function () {
+    player.play();
+});
+document.querySelector('[data-pause]').addEventListener('click', function () {
+    player.pause();
+});
+        </script>
+    </body>
+</html>
