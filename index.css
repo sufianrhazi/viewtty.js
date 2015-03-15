@@ -1,3 +1,6 @@
+.terminal-container {
+    overflow: auto;
+}
 .terminal {
     display: inline-block;
     font-family: "Consolas", monospace;
