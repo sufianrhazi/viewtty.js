@@ -5566,6 +5566,126 @@ Terminal.prototype.keySearch = function(ev, key) {
   return false;
 };
 
+/*
+ * Import/Export terminal state
+ */
+Terminal.prototype.exportState = function () {
+    return JSON.stringify({
+        rows: this.rows,
+        cols: this.cols,
+        ybase: this.ybase,
+        ydisp: this.ydisp,
+        x: this.x,
+        y: this.y,
+        cursorState: this.cursorState,
+        cursorHidden: this.cursorHidden,
+        convertEol: this.convertEol,
+        state: this.state,
+        queue: this.queue,
+        scrollTop: this.scrollTop,
+        scrollBottom: this.scrollBottom,
+        applicationKeypad: this.applicationKeypad,
+        applicationCursor: this.applicationCursor,
+        originMode: this.originMode,
+        insertMode: this.insertMode,
+        wraparoundMode: this.wraparoundMode,
+        normal: this.normal,
+        prefixMode: this.prefixMode,
+        selectMode: this.selectMode,
+        visualMode: this.visualMode,
+        searchMode: this.searchMode,
+        searchDown: this.searchDown,
+        entry: this.entry,
+        _real: this._real,
+        _selected: this._selected,
+        charset: this.charset,
+        gcharset: this.gcharset,
+        glevel: this.glevel,
+        charsets: this.charsets,
+        decLocator: this.decLocator,
+        x10Mouse: this.x10Mouse,
+        vt200Mouse: this.vt200Mouse,
+        vt300Mouse: this.vt300Mouse,
+        normalMouse: this.normalMouse,
+        mouseEvents: this.mouseEvents,
+        sendFocus: this.sendFocus,
+        utfMouse: this.utfMouse,
+        sgrMouse: this.sgrMouse,
+        urxvtMouse: this.urxvtMouse,
+        refreshStart: this.refreshStart,
+        refreshEnd: this.refreshEnd,
+        savedX: this.savedX,
+        savedY: this.savedY,
+        savedCols: this.savedCols,
+        curAttr: this.curAttr,
+        params: this.params,
+        currentParam: this.currentParam,
+        prefix: this.prefix,
+        postfix: this.postfix,
+        lines: this.lines,
+        tabs: this.tabs
+    });
+};
+
+Terminal.prototype.importState = function (serializedState) {
+    var state = JSON.parse(serializedState);
+    this.reset();
+    this.rows = state.rows;
+    this.cols = state.cols;
+    this.ybase = state.ybase;
+    this.ydisp = state.ydisp;
+    this.x = state.x;
+    this.y = state.y;
+    this.cursorState = state.cursorState;
+    this.cursorHidden = state.cursorHidden;
+    this.convertEol = state.convertEol;
+    this.state = state.state;
+    this.queue = state.queue;
+    this.scrollTop = state.scrollTop;
+    this.scrollBottom = state.scrollBottom;
+    this.applicationKeypad = state.applicationKeypad;
+    this.applicationCursor = state.applicationCursor;
+    this.originMode = state.originMode;
+    this.insertMode = state.insertMode;
+    this.wraparoundMode = state.wraparoundMode;
+    this.normal = state.normal;
+    this.prefixMode = state.prefixMode;
+    this.selectMode = state.selectMode;
+    this.visualMode = state.visualMode;
+    this.searchMode = state.searchMode;
+    this.searchDown = state.searchDown;
+    this.entry = state.entry;
+    this._real = state._real;
+    this._selected = state._selected;
+    this.charset = state.charset;
+    this.gcharset = state.gcharset;
+    this.glevel = state.glevel;
+    this.charsets = state.charsets;
+    this.decLocator = state.decLocator;
+    this.x10Mouse = state.x10Mouse;
+    this.vt200Mouse = state.vt200Mouse;
+    this.vt300Mouse = state.vt300Mouse;
+    this.normalMouse = state.normalMouse;
+    this.mouseEvents = state.mouseEvents;
+    this.sendFocus = state.sendFocus;
+    this.utfMouse = state.utfMouse;
+    this.sgrMouse = state.sgrMouse;
+    this.urxvtMouse = state.urxvtMouse;
+    this.refreshStart = state.refreshStart;
+    this.refreshEnd = state.refreshEnd;
+    this.savedX = state.savedX;
+    this.savedY = state.savedY;
+    this.savedCols = state.savedCols;
+    this.curAttr = state.curAttr;
+    this.params = state.params;
+    this.currentParam = state.currentParam;
+    this.prefix = state.prefix;
+    this.postfix = state.postfix;
+    this.lines = state.lines;
+    this.tabs = state.tabs;
+    this.refresh(0, this.rows - 1);
+};
+
 /**
  * Character Sets
  */
