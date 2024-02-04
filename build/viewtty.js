@@ -42,10 +42,10 @@
         EventEmitter.prototype.removeListener = function(type, listener) {
           if (!this._events[type])
             return;
-          var obj = this._events[type], i2 = obj.length;
-          while (i2--) {
-            if (obj[i2] === listener || obj[i2].listener === listener) {
-              obj.splice(i2, 1);
+          var obj = this._events[type], i = obj.length;
+          while (i--) {
+            if (obj[i] === listener || obj[i].listener === listener) {
+              obj.splice(i, 1);
               return;
             }
           }
@@ -67,9 +67,9 @@
         EventEmitter.prototype.emit = function(type) {
           if (!this._events[type])
             return;
-          var args = Array.prototype.slice.call(arguments, 1), obj = this._events[type], l = obj.length, i2 = 0;
-          for (; i2 < l; i2++) {
-            obj[i2].apply(this, args);
+          var args = Array.prototype.slice.call(arguments, 1), obj = this._events[type], l = obj.length, i = 0;
+          for (; i < l; i++) {
+            obj[i].apply(this, args);
           }
         };
         EventEmitter.prototype.listeners = function(type) {
@@ -179,8 +179,8 @@
           this.prefix = "";
           this.postfix = "";
           this.lines = [];
-          var i2 = this.rows;
-          while (i2--) {
+          var i = this.rows;
+          while (i--) {
             this.lines.push(this.blankLine());
           }
           this.tabs;
@@ -247,14 +247,14 @@
           // white
         ];
         Terminal2.colors = function() {
-          var colors = Terminal2.tangoColors.slice(), r = [0, 95, 135, 175, 215, 255], i2;
-          i2 = 0;
-          for (; i2 < 216; i2++) {
-            out(r[i2 / 36 % 6 | 0], r[i2 / 6 % 6 | 0], r[i2 % 6]);
+          var colors = Terminal2.tangoColors.slice(), r = [0, 95, 135, 175, 215, 255], i;
+          i = 0;
+          for (; i < 216; i++) {
+            out(r[i / 36 % 6 | 0], r[i / 6 % 6 | 0], r[i % 6]);
           }
-          i2 = 0;
-          for (; i2 < 24; i2++) {
-            r = 8 + i2 * 10;
+          i = 0;
+          for (; i < 24; i++) {
+            r = 8 + i * 10;
             out(r, r, r);
           }
           function out(r2, g, b) {
@@ -270,9 +270,9 @@
         Terminal2.colors[257] = "#f0f0f0";
         Terminal2._colors = Terminal2.colors.slice();
         Terminal2.vcolors = function() {
-          var out = [], colors = Terminal2.colors, i2 = 0, color;
-          for (; i2 < 256; i2++) {
-            color = parseInt(colors[i2].substring(1), 16);
+          var out = [], colors = Terminal2.colors, i = 0, color;
+          for (; i < 256; i++) {
+            color = parseInt(colors[i].substring(1), 16);
             out.push([
               color >> 16 & 255,
               color >> 8 & 255,
@@ -455,7 +455,7 @@
           head.insertBefore(style, head.firstChild);
         };
         Terminal2.prototype.open = function(parent) {
-          var self = this, i2 = 0, div;
+          var self = this, i = 0, div;
           this.parent = parent || this.parent;
           if (!this.parent) {
             throw new Error("Terminal requires a parent element.");
@@ -479,7 +479,7 @@
           this.element.style.backgroundColor = this.colors[256];
           this.element.style.color = this.colors[257];
           this.children = [];
-          for (; i2 < this.rows; i2++) {
+          for (; i < this.rows; i++) {
             div = this.document.createElement("div");
             this.element.appendChild(div);
             this.children.push(div);
@@ -749,7 +749,7 @@
           }
         };
         Terminal2.prototype.refresh = function(start, end) {
-          var x, y, i2, line, out, ch, width, data, attr, bg, fg, flags, row, parent;
+          var x, y, i, line, out, ch, width, data, attr, bg, fg, flags, row, parent;
           if (end - start >= this.rows / 2) {
             parent = this.element.parentNode;
             if (parent)
@@ -771,11 +771,11 @@
               x = -1;
             }
             attr = this.defAttr;
-            i2 = 0;
-            for (; i2 < width; i2++) {
-              data = line[i2][0];
-              ch = line[i2][1];
-              if (i2 === x)
+            i = 0;
+            for (; i < width; i++) {
+              data = line[i][0];
+              ch = line[i][1];
+              if (i === x)
                 data = -1;
               if (data !== attr) {
                 if (attr !== this.defAttr) {
@@ -841,7 +841,7 @@
                     out += "&nbsp;";
                   } else {
                     if (isWide(ch))
-                      i2++;
+                      i++;
                     out += ch;
                   }
                   break;
@@ -918,15 +918,15 @@
           this.refresh(0, this.rows - 1);
         };
         Terminal2.prototype.write = function(data) {
-          var l = data.length, i2 = 0, j, cs, ch;
+          var l = data.length, i = 0, j, cs, ch;
           this.refreshStart = this.y;
           this.refreshEnd = this.y;
           if (this.ybase !== this.ydisp) {
             this.ydisp = this.ybase;
             this.maxRange();
           }
-          for (; i2 < l; i2++) {
-            ch = data[i2];
+          for (; i < l; i++) {
+            ch = data[i];
             switch (this.state) {
               case normal:
                 switch (ch) {
@@ -1033,7 +1033,7 @@
                     this.setgLevel(0);
                     this.setgCharset(0, Terminal2.charsets.US);
                     this.state = normal;
-                    i2++;
+                    i++;
                     break;
                   case "(":
                   case ")":
@@ -1066,7 +1066,7 @@
                   case "/":
                     this.gcharset = 3;
                     this.state = charset;
-                    i2--;
+                    i--;
                     break;
                   case "N":
                     break;
@@ -1097,7 +1097,7 @@
                     break;
                   case "#":
                     this.state = normal;
-                    i2++;
+                    i++;
                     break;
                   case "H":
                     this.tabSet();
@@ -1164,7 +1164,7 @@
                     break;
                   case "/":
                     cs = Terminal2.charsets.ISOLatin;
-                    i2++;
+                    i++;
                     break;
                   default:
                     cs = Terminal2.charsets.US;
@@ -1177,7 +1177,7 @@
               case osc:
                 if (ch === "\x1B" || ch === "\x07") {
                   if (ch === "\x1B")
-                    i2++;
+                    i++;
                   this.params.push(this.currentParam);
                   switch (this.params[0]) {
                     case 0:
@@ -1385,7 +1385,7 @@
               case dcs:
                 if (ch === "\x1B" || ch === "\x07") {
                   if (ch === "\x1B")
-                    i2++;
+                    i++;
                   switch (this.prefix) {
                     case "":
                       break;
@@ -1439,7 +1439,7 @@
               case ignore:
                 if (ch === "\x1B" || ch === "\x07") {
                   if (ch === "\x1B")
-                    i2++;
+                    i++;
                   this.state = normal;
                 }
                 break;
@@ -1723,7 +1723,7 @@
           this.context.console.error.apply(this.context.console, args);
         };
         Terminal2.prototype.resize = function(x, y) {
-          var line, el, i2, j, ch;
+          var line, el, i, j, ch;
           if (x < 1)
             x = 1;
           if (y < 1)
@@ -1731,17 +1731,17 @@
           j = this.cols;
           if (j < x) {
             ch = [this.defAttr, " "];
-            i2 = this.lines.length;
-            while (i2--) {
-              while (this.lines[i2].length < x) {
-                this.lines[i2].push(ch);
+            i = this.lines.length;
+            while (i--) {
+              while (this.lines[i].length < x) {
+                this.lines[i].push(ch);
               }
             }
           } else if (j > x) {
-            i2 = this.lines.length;
-            while (i2--) {
-              while (this.lines[i2].length > x) {
-                this.lines[i2].pop();
+            i = this.lines.length;
+            while (i--) {
+              while (this.lines[i].length > x) {
+                this.lines[i].pop();
               }
             }
           }
@@ -1793,17 +1793,17 @@
           this.refreshStart = 0;
           this.refreshEnd = this.rows - 1;
         };
-        Terminal2.prototype.setupStops = function(i2) {
-          if (i2 != null) {
-            if (!this.tabs[i2]) {
-              i2 = this.prevStop(i2);
+        Terminal2.prototype.setupStops = function(i) {
+          if (i != null) {
+            if (!this.tabs[i]) {
+              i = this.prevStop(i);
             }
           } else {
             this.tabs = {};
-            i2 = 0;
+            i = 0;
           }
-          for (; i2 < this.cols; i2 += 8) {
-            this.tabs[i2] = true;
+          for (; i < this.cols; i += 8) {
+            this.tabs[i] = true;
           }
         };
         Terminal2.prototype.prevStop = function(x) {
@@ -1839,9 +1839,9 @@
         };
         Terminal2.prototype.blankLine = function(cur) {
           var attr = cur ? this.eraseAttr() : this.defAttr;
-          var ch = [attr, " "], line = [], i2 = 0;
-          for (; i2 < this.cols; i2++) {
-            line[i2] = ch;
+          var ch = [attr, " "], line = [], i = 0;
+          for (; i < this.cols; i++) {
+            line[i] = ch;
           }
           return line;
         };
@@ -1989,9 +1989,9 @@
             this.curAttr = this.defAttr;
             return;
           }
-          var l = params2.length, i2 = 0, flags = this.curAttr >> 18, fg = this.curAttr >> 9 & 511, bg = this.curAttr & 511, p;
-          for (; i2 < l; i2++) {
-            p = params2[i2];
+          var l = params2.length, i = 0, flags = this.curAttr >> 18, fg = this.curAttr >> 9 & 511, bg = this.curAttr & 511, p;
+          for (; i < l; i++) {
+            p = params2[i];
             if (p >= 30 && p <= 37) {
               fg = p - 30;
             } else if (p >= 40 && p <= 47) {
@@ -2031,35 +2031,35 @@
             } else if (p === 49) {
               bg = this.defAttr & 511;
             } else if (p === 38) {
-              if (params2[i2 + 1] === 2) {
-                i2 += 2;
+              if (params2[i + 1] === 2) {
+                i += 2;
                 fg = matchColor(
-                  params2[i2] & 255,
-                  params2[i2 + 1] & 255,
-                  params2[i2 + 2] & 255
+                  params2[i] & 255,
+                  params2[i + 1] & 255,
+                  params2[i + 2] & 255
                 );
                 if (fg === -1)
                   fg = 511;
-                i2 += 2;
-              } else if (params2[i2 + 1] === 5) {
-                i2 += 2;
-                p = params2[i2] & 255;
+                i += 2;
+              } else if (params2[i + 1] === 5) {
+                i += 2;
+                p = params2[i] & 255;
                 fg = p;
               }
             } else if (p === 48) {
-              if (params2[i2 + 1] === 2) {
-                i2 += 2;
+              if (params2[i + 1] === 2) {
+                i += 2;
                 bg = matchColor(
-                  params2[i2] & 255,
-                  params2[i2 + 1] & 255,
-                  params2[i2 + 2] & 255
+                  params2[i] & 255,
+                  params2[i + 1] & 255,
+                  params2[i + 2] & 255
                 );
                 if (bg === -1)
                   bg = 511;
-                i2 += 2;
-              } else if (params2[i2 + 1] === 5) {
-                i2 += 2;
-                p = params2[i2] & 255;
+                i += 2;
+              } else if (params2[i + 1] === 5) {
+                i += 2;
+                p = params2[i] & 255;
                 bg = p;
               }
             } else if (p === 100) {
@@ -2262,9 +2262,9 @@
         };
         Terminal2.prototype.setMode = function(params2) {
           if (typeof params2 === "object") {
-            var l = params2.length, i2 = 0;
-            for (; i2 < l; i2++) {
-              this.setMode(params2[i2]);
+            var l = params2.length, i = 0;
+            for (; i < l; i++) {
+              this.setMode(params2[i]);
             }
             return;
           }
@@ -2358,9 +2358,9 @@
         };
         Terminal2.prototype.resetMode = function(params2) {
           if (typeof params2 === "object") {
-            var l = params2.length, i2 = 0;
-            for (; i2 < l; i2++) {
-              this.resetMode(params2[i2]);
+            var l = params2.length, i = 0;
+            for (; i < l; i++) {
+              this.resetMode(params2[i]);
             }
             return;
           }
@@ -2555,11 +2555,11 @@
         };
         Terminal2.prototype.setAttrInRectangle = function(params2) {
           var t = params2[0], l = params2[1], b = params2[2], r = params2[3], attr = params2[4];
-          var line, i2;
+          var line, i;
           for (; t < b + 1; t++) {
             line = this.lines[this.ybase + t];
-            for (i2 = l; i2 < r; i2++) {
-              line[i2] = [attr, line[i2][1]];
+            for (i = l; i < r; i++) {
+              line[i] = [attr, line[i][1]];
             }
           }
           this.updateRange(params2[0]);
@@ -2597,11 +2597,11 @@
         };
         Terminal2.prototype.fillRectangle = function(params2) {
           var ch = params2[0], t = params2[1], l = params2[2], b = params2[3], r = params2[4];
-          var line, i2;
+          var line, i;
           for (; t < b + 1; t++) {
             line = this.lines[this.ybase + t];
-            for (i2 = l; i2 < r; i2++) {
-              line[i2] = [line[i2][0], String2.fromCharCode(ch)];
+            for (i = l; i < r; i++) {
+              line[i] = [line[i][0], String2.fromCharCode(ch)];
             }
           }
           this.updateRange(params2[1]);
@@ -2612,12 +2612,12 @@
         };
         Terminal2.prototype.eraseRectangle = function(params2) {
           var t = params2[0], l = params2[1], b = params2[2], r = params2[3];
-          var line, i2, ch;
+          var line, i, ch;
           ch = [this.eraseAttr(), " "];
           for (; t < b + 1; t++) {
             line = this.lines[this.ybase + t];
-            for (i2 = l; i2 < r; i2++) {
-              line[i2] = ch;
+            for (i = l; i < r; i++) {
+              line[i] = ch;
             }
           }
           this.updateRange(params2[0]);
@@ -2633,21 +2633,21 @@
           ;
         };
         Terminal2.prototype.insertColumns = function() {
-          var param = params[0], l = this.ybase + this.rows, ch = [this.eraseAttr(), " "], i2;
+          var param = params[0], l = this.ybase + this.rows, ch = [this.eraseAttr(), " "], i;
           while (param--) {
-            for (i2 = this.ybase; i2 < l; i2++) {
-              this.lines[i2].splice(this.x + 1, 0, ch);
-              this.lines[i2].pop();
+            for (i = this.ybase; i < l; i++) {
+              this.lines[i].splice(this.x + 1, 0, ch);
+              this.lines[i].pop();
             }
           }
           this.maxRange();
         };
         Terminal2.prototype.deleteColumns = function() {
-          var param = params[0], l = this.ybase + this.rows, ch = [this.eraseAttr(), " "], i2;
+          var param = params[0], l = this.ybase + this.rows, ch = [this.eraseAttr(), " "], i;
           while (param--) {
-            for (i2 = this.ybase; i2 < l; i2++) {
-              this.lines[i2].splice(this.x, 1);
-              this.lines[i2].push(ch);
+            for (i = this.ybase; i < l; i++) {
+              this.lines[i].splice(this.x, 1);
+              this.lines[i].push(ch);
             }
           }
           this.maxRange();
@@ -2708,10 +2708,10 @@
           this._real.preSearchX = this.x;
           this._real.preSearchY = this.y;
           var bottom = this.ydisp + this.rows - 1;
-          for (var i2 = 0; i2 < this.entryPrefix.length; i2++) {
-            this.lines[bottom][i2] = [
+          for (var i = 0; i < this.entryPrefix.length; i++) {
+            this.lines[bottom][i] = [
               this.defAttr & ~511 | 4,
-              this.entryPrefix[i2]
+              this.entryPrefix[i]
             ];
           }
           this.y = this.rows - 1;
@@ -3276,7 +3276,7 @@
             var first_is_space = -1;
             var y = this.y + (key === "{" ? -1 : 1);
             var yb = this.ydisp;
-            var i2;
+            var i;
             if (key === "{") {
               if (y < 0) {
                 y++;
@@ -3292,14 +3292,14 @@
             }
             for (; ; ) {
               line = this.lines[yb + y];
-              for (i2 = 0; i2 < this.cols; i2++) {
-                if (line[i2][1] > " ") {
+              for (i = 0; i < this.cols; i++) {
+                if (line[i][1] > " ") {
                   if (first_is_space === -1) {
                     first_is_space = 0;
                   }
                   saw_full = true;
                   break;
-                } else if (i2 === this.cols - 1) {
+                } else if (i === this.cols - 1) {
                   if (first_is_space === -1) {
                     first_is_space = 1;
                   } else if (first_is_space === 0) {
@@ -3377,24 +3377,24 @@
             var wrapped = false;
             var x = this.x + 1;
             var y = this.ydisp + this.y;
-            var yb, i2;
+            var yb, i;
             var up = key === "N" ? this.searchDown : !this.searchDown;
             for (; ; ) {
               line = this.lines[y];
               while (x < this.cols) {
-                for (i2 = 0; i2 < entry.length; i2++) {
-                  if (x + i2 >= this.cols)
+                for (i = 0; i < entry.length; i++) {
+                  if (x + i >= this.cols)
                     break;
-                  if (line[x + i2][1] !== entry[i2]) {
+                  if (line[x + i][1] !== entry[i]) {
                     break;
-                  } else if (line[x + i2][1] === entry[i2] && i2 === entry.length - 1) {
+                  } else if (line[x + i][1] === entry[i] && i === entry.length - 1) {
                     found = true;
                     break;
                   }
                 }
                 if (found)
                   break;
-                x += i2 + 1;
+                x += i + 1;
               }
               if (found)
                 break;
@@ -3444,9 +3444,9 @@
               return;
             var bottom = this.ydisp + this.rows - 1;
             this.entry = this.entry.slice(0, -1);
-            var i2 = this.entryPrefix.length + this.entry.length;
-            this.lines[bottom][i2] = [
-              this.lines[bottom][i2][0],
+            var i = this.entryPrefix.length + this.entry.length;
+            this.lines[bottom][i] = [
+              this.lines[bottom][i][0],
               " "
             ];
             this.x--;
@@ -3457,8 +3457,8 @@
           if (key.length === 1 && key >= " " && key <= "~") {
             var bottom = this.ydisp + this.rows - 1;
             this.entry += key;
-            var i2 = this.entryPrefix.length + this.entry.length - 1;
-            this.lines[bottom][i2] = [
+            var i = this.entryPrefix.length + this.entry.length - 1;
+            this.lines[bottom][i] = [
               this.defAttr & ~511 | 4,
               key
             ];
@@ -3700,10 +3700,10 @@
         var setTimeout2 = this.setTimeout;
         var setInterval = this.setInterval;
         function indexOf(obj, el) {
-          var i2 = obj.length;
-          while (i2--) {
-            if (obj[i2] === el)
-              return i2;
+          var i = obj.length;
+          while (i--) {
+            if (obj[i] === el)
+              return i;
           }
           return -1;
         }
@@ -3717,20 +3717,20 @@
           if (matchColor._cache[hash] != null) {
             return matchColor._cache[hash];
           }
-          var ldiff = Infinity, li = -1, i2 = 0, c, r2, g2, b2, diff;
-          for (; i2 < Terminal2.vcolors.length; i2++) {
-            c = Terminal2.vcolors[i2];
+          var ldiff = Infinity, li = -1, i = 0, c, r2, g2, b2, diff;
+          for (; i < Terminal2.vcolors.length; i++) {
+            c = Terminal2.vcolors[i];
             r2 = c[0];
             g2 = c[1];
             b2 = c[2];
             diff = matchColor.distance(r1, g1, b1, r2, g2, b2);
             if (diff === 0) {
-              li = i2;
+              li = i;
               break;
             }
             if (diff < ldiff) {
               ldiff = diff;
-              li = i2;
+              li = i;
             }
           }
           return matchColor._cache[hash] = li;
@@ -3742,8 +3742,8 @@
         function each(obj, iter, con) {
           if (obj.forEach)
             return obj.forEach(iter, con);
-          for (var i2 = 0; i2 < obj.length; i2++) {
-            iter.call(con, obj[i2], i2, obj);
+          for (var i = 0; i < obj.length; i++) {
+            iter.call(con, obj[i], i, obj);
           }
         }
         function keys(obj) {
@@ -3844,6 +3844,7 @@
     var chunks = [];
     var frame = this._frame;
     var startIndex;
+    let i;
     for (i = this._frame; i < this._chunks.length && this._chunks[i].ms <= now - this._startTime; ++i) {
       chunks.push(this._chunks[i]);
     }
@@ -3868,31 +3869,31 @@
   // lib/parser.js
   function decodeUtf8(arr) {
     var result = "";
-    for (var i2 = 0; i2 < arr.length; ++i2) {
-      var code = arr[i2];
+    for (var i = 0; i < arr.length; ++i) {
+      var code = arr[i];
       var n;
       if (code & 128) {
         n = 0;
-        if ((arr[i2] & 64) === 0) {
+        if ((arr[i] & 64) === 0) {
           throw new Error("Bad UTF-8 Sequence: mismatch");
-        } else if ((arr[i2] & 32) === 0) {
+        } else if ((arr[i] & 32) === 0) {
           n = 1;
-          code = arr[i2] & 31;
-        } else if ((arr[i2] & 16) === 0) {
+          code = arr[i] & 31;
+        } else if ((arr[i] & 16) === 0) {
           n = 2;
-          code = arr[i2] & 15;
-        } else if ((arr[i2] & 8) === 0) {
+          code = arr[i] & 15;
+        } else if ((arr[i] & 8) === 0) {
           n = 3;
-          code = arr[i2] & 7;
+          code = arr[i] & 7;
         } else
           throw new Error(
             "Bad UTF-8 Sequence: more than 6 additional chars"
           );
         for (var j = 0; j < n; ++j) {
-          i2++;
-          if (i2 >= arr.length)
+          i++;
+          if (i >= arr.length)
             throw new Error("Bad UTF-8 Sequence: need more data");
-          code = code << 6 | arr[i2] & 63;
+          code = code << 6 | arr[i] & 63;
         }
         if (code > 1114111)
           throw new Error("Bad UTF-8 Sequence: code point too large");
@@ -3945,6 +3946,6 @@
   var ViewTTY = {
     Parser,
     Player,
-    Terminal: import_term.Terminal
+    Terminal: import_term.default
   };
 })();
