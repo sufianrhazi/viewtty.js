@@ -20,6 +20,7 @@
     "terminal"
   ],
   "main": "./index.js",
+  "type": "module",
   "homepage": "https://github.com/sufianrhazi/viewtty.js.git",
   "repository": "git://github.com/sufianrhazi/viewtty.js.git",
   "bugs": {
@@ -30,8 +31,9 @@
     "term.js": "0.0.4"
   },
   "devDependencies": {
-    "browserify": "^9.0.3",
-    "uglify": "^0.1.1"
+    "prettier": "3.2.4",
+    "typescript": "5.3.3",
+    "esbuild": "0.20.0"
   },
   "private": true
 }

@@ -1,9 +1,9 @@
-var Player = require('./lib/player.js');
-var Parser = require('./lib/parser.js');
-var Terminal = require('./ext/term.js');
+import { Player } from './lib/player.js';
+import { Parser } from './lib/parser.js';
+import { Terminal } from './ext/term.cjs';
 
-window.ViewTTY = module.exports = {
+export const ViewTTY = {
     Parser: Parser,
     Player: Player,
-    Terminal: Terminal
+    Terminal: Terminal,
 };

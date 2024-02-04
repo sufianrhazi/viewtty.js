@@ -4,9 +4,9 @@ clean:
 	rm -f build/*
 
 build/viewtty.min.js: build/viewtty.js
-	node_modules/.bin/uglify -o $@ -s $<
+	yarn run esbuild --bundle --minify --outfile=$@ < $<
 
 build/viewtty.js: index.js $(wildcard lib/*.js) $(wildcard ext/*.js)
-	node_modules/.bin/browserify -d --outfile $@ $<
+	yarn run esbuild --bundle --outfile=$@ < $<
 
 .PHONY: all clean
