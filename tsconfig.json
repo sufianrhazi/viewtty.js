@@ -1,0 +1,36 @@
+{
+  "compilerOptions": {
+    "lib": ["ES2019", "DOM"],
+    "target": "ES2019",
+
+    "jsx": "react",
+    "jsxFactory": "Gooey",
+    "jsxFragmentFactory": "Gooey.Fragment",
+
+    "module": "ES2015",
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "paths": {},
+
+    "isolatedModules": true,
+    "useDefineForClassFields": false,
+
+    "declaration": true,
+    "declarationMap": true,
+    "emitDeclarationOnly": true,
+    "sourceMap": true,
+    "newLine": "lf",
+
+    "rootDir": "./",
+    "outDir": "./build/tsc",
+
+    "strict": true
+  },
+  "include": [
+    "./index.ts",
+    "./lib/**/*.ts",
+    "./lib/**/*.tsx"
+  ]
+}

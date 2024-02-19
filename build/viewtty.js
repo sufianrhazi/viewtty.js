@@ -28,6 +28,7 @@
   // ext/term.cjs
   var require_term = __commonJS({
     "ext/term.cjs"(exports, module) {
+      "use strict";
       (function() {
         "use strict";
         var window2 = this, document = this.document;
@@ -3773,40 +3774,40 @@
     }
   });
 
-  // lib/player.js
-  function Player() {
-    this._chunks = null;
-    this._frame = 0;
-    this._startTime = null;
-    this._tickHandle = null;
-    this.listeners = [];
-  }
-  Player.prototype.load = function(chunks) {
-    this._chunks = chunks;
-    this.rewind();
-  };
-  Player.prototype.addListener = function(f) {
-    this.listeners.push(f);
-  };
-  Player.prototype.removeListener = function(f) {
-    this.listeners = this.listeners.filter(function(elem) {
-      return f !== elem;
-    });
-  };
-  Player.prototype.play = function play() {
-    if (this._tickHandle) {
-      return true;
+  // lib/player.ts
+  var Player = class {
+    constructor() {
+      this._chunks = null;
+      this._frame = 0;
+      this._startTime = null;
+      this._tickHandle = null;
+      this.listeners = [];
     }
-    if (this._frame >= this._chunks.length) {
-      return true;
+    load(chunks) {
+      this._chunks = chunks;
+      this.rewind();
     }
-    this._emit("play");
-    this._step();
-    return false;
-  };
-  Player.prototype._emit = function _emit(type, data) {
-    this.listeners.forEach(
-      function(f) {
+    addListener(f) {
+      this.listeners.push(f);
+    }
+    removeListener(f) {
+      this.listeners = this.listeners.filter(function(elem) {
+        return f !== elem;
+      });
+    }
+    play() {
+      if (this._tickHandle) {
+        return true;
+      }
+      if (this._frame >= this._chunks.length) {
+        return true;
+      }
+      this._emit("play");
+      this._step();
+      return false;
+    }
+    _emit(type, data) {
+      this.listeners.forEach((f) => {
         try {
           f({
             type,
@@ -3817,56 +3818,55 @@
             throw e;
           }, 0);
         }
-      }.bind(this)
-    );
-  };
-  Player.prototype.pause = function pause() {
-    if (this._tickHandle) {
-      this._emit("pause");
-      clearTimeout(this._tickHandle);
-      this._tickHandle = null;
-      this._startTime = null;
+      });
     }
-  };
-  Player.prototype.rewind = function rewind() {
-    this.pause();
-    this._emit("rewind");
-    this._frame = 0;
-  };
-  Player.prototype._step = function _step() {
-    var now;
-    if (this._startTime === null) {
-      this._startTime = (/* @__PURE__ */ new Date()).getTime() - this._chunks[this._frame].ms;
-      now = this._startTime;
-    } else {
-      now = (/* @__PURE__ */ new Date()).getTime();
+    pause() {
+      if (this._tickHandle) {
+        this._emit("pause");
+        clearTimeout(this._tickHandle);
+        this._tickHandle = null;
+        this._startTime = null;
+      }
     }
-    var chunks = [];
-    var frame = this._frame;
-    var startIndex;
-    let i;
-    for (i = this._frame; i < this._chunks.length && this._chunks[i].ms <= now - this._startTime; ++i) {
-      chunks.push(this._chunks[i]);
+    rewind() {
+      this.pause();
+      this._emit("rewind");
+      this._frame = 0;
     }
-    this._frame = i;
-    chunks.forEach(
-      function(chunk) {
+    _step() {
+      var now;
+      if (this._startTime === null) {
+        this._startTime = (/* @__PURE__ */ new Date()).getTime() - this._chunks[this._frame].ms;
+        now = this._startTime;
+      } else {
+        now = (/* @__PURE__ */ new Date()).getTime();
+      }
+      var dt = now - this._startTime;
+      var chunks = [];
+      var frame = this._frame;
+      var startIndex;
+      let i;
+      for (i = this._frame; i < this._chunks.length && this._chunks[i].ms <= dt; ++i) {
+        chunks.push(this._chunks[i]);
+      }
+      this._frame = i;
+      chunks.forEach((chunk) => {
         this._emit("data", {
           data: chunk.data,
           frame,
           ms: chunk.ms
         });
-      }.bind(this)
-    );
-    if (this._frame < this._chunks.length) {
-      var delta = this._chunks[i].ms - now;
-      this._tickHandle = setTimeout(this._step.bind(this), delta);
-    } else {
-      this._emit("end");
+      });
+      if (this._frame < this._chunks.length) {
+        var delta = this._chunks[this._frame].ms - dt;
+        this._tickHandle = setTimeout(() => this._step(), delta);
+      } else {
+        this._emit("end");
+      }
     }
   };
 
-  // lib/parser.js
+  // lib/parser.ts
   function decodeUtf8(arr) {
     var result = "";
     for (var i = 0; i < arr.length; ++i) {
@@ -3911,41 +3911,41 @@
     }
     return result;
   }
-  function Parser() {
-  }
-  Parser.prototype.parse = function(buffer) {
-    var chunks = [];
-    var startTime = null;
-    for (var offset = 0; offset < buffer.byteLength; ) {
-      var header = new Uint32Array(buffer.slice(offset + 0, offset + 12));
-      var sec = header[0];
-      var usec = header[1];
-      var len = header[2];
-      var ms;
-      if (startTime === null) {
-        startTime = sec * 1e3 + usec / 1e3;
-        ms = 0;
-      } else {
-        ms = sec * 1e3 + usec / 1e3 - startTime;
+  var Parser = class {
+    parse(buffer) {
+      var chunks = [];
+      var startTime = null;
+      for (var offset = 0; offset < buffer.byteLength; ) {
+        var header = new Uint32Array(buffer.slice(offset + 0, offset + 12));
+        var sec = header[0];
+        var usec = header[1];
+        var len = header[2];
+        var ms;
+        if (startTime === null) {
+          startTime = sec * 1e3 + usec / 1e3;
+          ms = 0;
+        } else {
+          ms = sec * 1e3 + usec / 1e3 - startTime;
+        }
+        offset += 12;
+        var data = decodeUtf8(
+          new Uint8Array(buffer.slice(offset + 0, offset + len))
+        );
+        offset += len;
+        chunks.push({
+          ms,
+          data
+        });
       }
-      offset += 12;
-      var data = decodeUtf8(
-        new Uint8Array(buffer.slice(offset + 0, offset + len))
-      );
-      offset += len;
-      chunks.push({
-        ms,
-        data
-      });
+      return chunks;
     }
-    return chunks;
   };
 
   // <stdin>
-  var import_term = __toESM(require_term());
+  var Terminal = __toESM(require_term());
   var ViewTTY = {
     Parser,
     Player,
-    Terminal: import_term.default
+    Terminal: Terminal.default
   };
 })();

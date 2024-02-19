@@ -1,10 +1,10 @@
 // Tradeoff: the browser allows for UTF-8 decoding of binary data through the
 // Blob and FileReader interface, but this is an asynchronous API.
 // This synchronous UTF-8 decoder is the most reasonable path forward for now.
-function decodeUtf8(arr) {
+function decodeUtf8(arr: Uint8Array) {
     var result = '';
     for (var i = 0; i < arr.length; ++i) {
-        var code = arr[i];
+        var code: number = arr[i];
         var n;
         if (code & 0x80) {
             n = 0;
@@ -46,39 +46,40 @@ function decodeUtf8(arr) {
     return result;
 }
 
-export function Parser() {}
-Parser.prototype.parse = function (buffer) {
-    // buffer is a list of header chunks followed by data chunks.
-    // A header chunk is two 32-byte little-endian unsigned integers:
-    // - seconds
-    // - microseconds
-    // A data chunk is one 32-byte little-endian unsigned integer:
-    // - length
-    // followed by `length` bytes of terminal input data.
-    // We assume this data is UTF-8 encoded.
-    var chunks = [];
-    var startTime = null;
-    for (var offset = 0; offset < buffer.byteLength; ) {
-        var header = new Uint32Array(buffer.slice(offset + 0, offset + 12));
-        var sec = header[0];
-        var usec = header[1];
-        var len = header[2];
-        var ms;
-        if (startTime === null) {
-            startTime = sec * 1000 + usec / 1000;
-            ms = 0;
-        } else {
-            ms = sec * 1000 + usec / 1000 - startTime;
+export class Parser {
+    parse(buffer: any) {
+        // buffer is a list of header chunks followed by data chunks.
+        // A header chunk is two 32-byte little-endian unsigned integers:
+        // - seconds
+        // - microseconds
+        // A data chunk is one 32-byte little-endian unsigned integer:
+        // - length
+        // followed by `length` bytes of terminal input data.
+        // We assume this data is UTF-8 encoded.
+        var chunks = [];
+        var startTime = null;
+        for (var offset = 0; offset < buffer.byteLength; ) {
+            var header = new Uint32Array(buffer.slice(offset + 0, offset + 12));
+            var sec = header[0];
+            var usec = header[1];
+            var len = header[2];
+            var ms;
+            if (startTime === null) {
+                startTime = sec * 1000 + usec / 1000;
+                ms = 0;
+            } else {
+                ms = sec * 1000 + usec / 1000 - startTime;
+            }
+            offset += 12;
+            var data = decodeUtf8(
+                new Uint8Array(buffer.slice(offset + 0, offset + len))
+            );
+            offset += len;
+            chunks.push({
+                ms: ms,
+                data: data,
+            });
         }
-        offset += 12;
-        var data = decodeUtf8(
-            new Uint8Array(buffer.slice(offset + 0, offset + len))
-        );
-        offset += len;
-        chunks.push({
-            ms: ms,
-            data: data,
-        });
+        return chunks;
     }
-    return chunks;
-};
+}
