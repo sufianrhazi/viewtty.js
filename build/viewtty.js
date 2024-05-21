@@ -3834,13 +3834,10 @@
       this._frame = 0;
     }
     _step() {
-      var now;
       if (this._startTime === null) {
-        this._startTime = (/* @__PURE__ */ new Date()).getTime() - this._chunks[this._frame].ms;
-        now = this._startTime;
-      } else {
-        now = (/* @__PURE__ */ new Date()).getTime();
+        this._startTime = this._chunks[this._frame].ms;
       }
+      var now = this._chunks[this._frame].ms;
       var dt = now - this._startTime;
       var chunks = [];
       var frame = this._frame;

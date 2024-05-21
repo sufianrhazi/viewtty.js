@@ -1,6 +1,6 @@
 {
   "name": "viewtty",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A ttyrec player for the browser",
   "author": {
     "name": "Sufian Rhazi",
