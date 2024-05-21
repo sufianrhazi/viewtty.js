@@ -1,6 +1,6 @@
 {
   "name": "viewtty",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A ttyrec player for the browser",
   "author": {
     "name": "Sufian Rhazi",
@@ -31,9 +31,9 @@
     "term.js": "0.0.4"
   },
   "devDependencies": {
+    "esbuild": "0.20.0",
     "prettier": "3.2.4",
-    "typescript": "5.3.3",
-    "esbuild": "0.20.0"
+    "typescript": "5.3.3"
   },
   "private": true
 }

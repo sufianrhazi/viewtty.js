@@ -3867,54 +3867,68 @@
   };
 
   // lib/parser.ts
-  function decodeUtf8(arr) {
-    var result = "";
-    for (var i = 0; i < arr.length; ++i) {
-      var code = arr[i];
-      var n;
-      if (code & 128) {
-        n = 0;
-        if ((arr[i] & 64) === 0) {
+  var UTF8Decoder = class {
+    constructor(emitter) {
+      this.pendingCodePoint = 0;
+      this.emitter = emitter;
+      this.needed = 0;
+    }
+    next(byte) {
+      if (this.needed === 0) {
+        if ((byte & 128) === 0) {
+          this.emitter(String.fromCodePoint(byte));
+        } else if ((byte & 64) === 0) {
           throw new Error("Bad UTF-8 Sequence: mismatch");
-        } else if ((arr[i] & 32) === 0) {
-          n = 1;
-          code = arr[i] & 31;
-        } else if ((arr[i] & 16) === 0) {
-          n = 2;
-          code = arr[i] & 15;
-        } else if ((arr[i] & 8) === 0) {
-          n = 3;
-          code = arr[i] & 7;
-        } else
-          throw new Error(
-            "Bad UTF-8 Sequence: more than 6 additional chars"
-          );
-        for (var j = 0; j < n; ++j) {
-          i++;
-          if (i >= arr.length)
-            throw new Error("Bad UTF-8 Sequence: need more data");
-          code = code << 6 | arr[i] & 63;
-        }
-        if (code > 1114111)
-          throw new Error("Bad UTF-8 Sequence: code point too large");
-        if (code > 65535) {
-          var surrogate = code - 65536;
-          var high = 55296 + ((surrogate & 1047552) >> 10);
-          var low = 56320 + (surrogate & 1023);
-          result += String.fromCharCode(high) + String.fromCharCode(low);
+        } else if ((byte & 32) === 0) {
+          this.needed = 1;
+          this.pendingCodePoint = byte & 31;
+        } else if ((byte & 16) === 0) {
+          this.needed = 2;
+          this.pendingCodePoint = byte & 15;
+        } else if ((byte & 8) === 0) {
+          this.needed = 3;
+          this.pendingCodePoint = byte & 7;
         } else {
-          result += String.fromCharCode(code);
+          throw new Error(
+            "Bad UTF-8 Sequence: 11110xxx not found at start"
+          );
         }
       } else {
-        result += String.fromCharCode(code);
+        if ((byte & 192) !== 128) {
+          throw new Error(
+            "Bad UTF-8 Sequence: 10xxxxxx not found in trailing bytes"
+          );
+        }
+        this.pendingCodePoint = this.pendingCodePoint << 6 | byte & 63;
+        this.needed -= 1;
+        if (this.needed === 0) {
+          if (this.pendingCodePoint > 1114111) {
+            throw new Error("Bad UTF-8 Sequence: code point too large");
+          }
+          if (this.pendingCodePoint > 65535) {
+            var surrogate = this.pendingCodePoint - 65536;
+            var high = 55296 + ((surrogate & 1047552) >> 10);
+            var low = 56320 + (surrogate & 1023);
+            this.emitter(
+              String.fromCharCode(high) + String.fromCharCode(low)
+            );
+            this.pendingCodePoint = 0;
+          } else {
+            this.emitter(String.fromCharCode(this.pendingCodePoint));
+            this.pendingCodePoint = 0;
+          }
+        }
       }
     }
-    return result;
-  }
+  };
   var Parser = class {
     parse(buffer) {
       var chunks = [];
       var startTime = null;
+      var chunk = "";
+      var decoder = new UTF8Decoder((str) => {
+        chunk += str;
+      });
       for (var offset = 0; offset < buffer.byteLength; ) {
         var header = new Uint32Array(buffer.slice(offset + 0, offset + 12));
         var sec = header[0];
@@ -3928,13 +3942,17 @@
           ms = sec * 1e3 + usec / 1e3 - startTime;
         }
         offset += 12;
-        var data = decodeUtf8(
-          new Uint8Array(buffer.slice(offset + 0, offset + len))
+        const byteArray = new Uint8Array(
+          buffer.slice(offset + 0, offset + len)
         );
+        chunk = "";
+        for (let i = 0; i < len; ++i) {
+          decoder.next(byteArray[i]);
+        }
         offset += len;
         chunks.push({
           ms,
-          data
+          data: chunk
         });
       }
       return chunks;
