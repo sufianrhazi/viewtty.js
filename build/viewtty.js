@@ -3776,12 +3776,19 @@
 
   // lib/player.ts
   var Player = class {
-    constructor() {
-      this._chunks = null;
+    constructor({
+      now: depNow,
+      setTimeout: depSetTimeout,
+      clearTimeout: depClearTimeout
+    } = {}) {
+      this._chunks = [];
       this._frame = 0;
       this._startTime = null;
       this._tickHandle = null;
       this.listeners = [];
+      this.now = depNow || (() => Date.now());
+      this.setTimeout = depSetTimeout || setTimeout;
+      this.clearTimeout = depClearTimeout || clearTimeout;
     }
     load(chunks) {
       this._chunks = chunks;
@@ -3796,7 +3803,7 @@
       });
     }
     play() {
-      if (this._tickHandle) {
+      if (this._tickHandle !== null) {
         return true;
       }
       if (this._frame >= this._chunks.length) {
@@ -3807,23 +3814,26 @@
       return false;
     }
     _emit(type, data) {
+      let record;
+      if (type === "data") {
+        record = { type, data };
+      } else {
+        record = { type };
+      }
       this.listeners.forEach((f) => {
         try {
-          f({
-            type,
-            data
-          });
+          f(record);
         } catch (e) {
-          setTimeout(function() {
+          this.setTimeout(function() {
             throw e;
           }, 0);
         }
       });
     }
     pause() {
-      if (this._tickHandle) {
+      if (this._tickHandle !== null) {
         this._emit("pause");
-        clearTimeout(this._tickHandle);
+        this.clearTimeout(this._tickHandle);
         this._tickHandle = null;
         this._startTime = null;
       }
@@ -3835,28 +3845,31 @@
     }
     _step() {
       if (this._startTime === null) {
-        this._startTime = this._chunks[this._frame].ms;
+        this._startTime = this.now();
+        if (this._frame < this._chunks.length) {
+          this._startTime -= this._chunks[this._frame].ms;
+        }
       }
-      var now = this._chunks[this._frame].ms;
-      var dt = now - this._startTime;
+      var now = this.now();
+      var elapsed = now - this._startTime;
       var chunks = [];
       var frame = this._frame;
       var startIndex;
       let i;
-      for (i = this._frame; i < this._chunks.length && this._chunks[i].ms <= dt; ++i) {
+      for (i = this._frame; i < this._chunks.length && this._chunks[i].ms <= elapsed; ++i) {
         chunks.push(this._chunks[i]);
       }
       this._frame = i;
       chunks.forEach((chunk) => {
         this._emit("data", {
           data: chunk.data,
-          frame,
           ms: chunk.ms
         });
       });
       if (this._frame < this._chunks.length) {
-        var delta = this._chunks[this._frame].ms - dt;
-        this._tickHandle = setTimeout(() => this._step(), delta);
+        const lastFrame = this._frame > 0 ? this._frame - 1 : 0;
+        var delta = this._chunks[this._frame].ms - elapsed;
+        this._tickHandle = this.setTimeout(() => this._step(), delta);
       } else {
         this._emit("end");
       }

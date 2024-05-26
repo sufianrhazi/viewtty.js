@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -e
+cd "$(dirname "$0")/.."
+clear
+for IN_FILE in lib/*.test.ts; do
+    OUT_FILE=${IN_FILE/lib/test}
+    OUT_FILE=${OUT_FILE/.ts/.js}
+    echo "BUNDLE $IN_FILE -> $OUT_FILE"
+    npm exec -- esbuild --platform=node --bundle --format=esm --log-level=error --outfile="$OUT_FILE" "$IN_FILE"
+done
+for OUT_FILE in test/*.test.js; do
+    echo "TEST FILE $OUT_FILE"
+    node "$OUT_FILE"
+done
